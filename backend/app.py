@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ilyanosovsky:1235846Qq@localhost:5432/flask-test'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ilyanosovsky:1235846Qq@localhost:5432/flask-db'
 app.config['JWT_SECRET_KEY'] = 'your_secret_key'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
