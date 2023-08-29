@@ -18,8 +18,15 @@ jwt = JWTManager(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(80), unique=True, nullable=False)  # Changed from username to email
+    email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organization.id'), nullable=True)
+
+# Define the Organization model
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
+    users = db.relationship('User', backref='organization', lazy=True)
 
 
 @app.route('/signup', methods=['POST'])
@@ -27,7 +34,7 @@ def signup():
     data = request.get_json()
     print("data ----> ", data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
-    new_user = User(email=data['email'], password=hashed_password)  # Modified here
+    new_user = User(email=data['email'], password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User created!"}), 201
@@ -35,11 +42,73 @@ def signup():
 @app.route('/signin', methods=['POST'])
 def signin():
     data = request.get_json()
-    user = User.query.filter_by(email=data['email']).first()  # Modified here
+    user = User.query.filter_by(email=data['email']).first()
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({"message": "Invalid credentials!"}), 401
-    access_token = create_access_token(identity=user.email)  # Use email as identity
+    access_token = create_access_token(identity=user.email)
     return jsonify({"access_token": access_token})
+
+# Route to create organizations (requires authentication)
+@app.route('/organizations', methods=['POST'])
+# @jwt_required  # Requires the user to be authenticated
+def create_organization():
+    data = request.get_json()
+    new_organization = Organization(name=data['name'])
+    db.session.add(new_organization)
+    db.session.commit()
+    return jsonify({"message": "Organization created!"}), 201
+
+# Route to add a user to an organization (requires authentication)
+@app.route('/organizations/<org_id>/add_user', methods=['POST'])
+# @jwt_required  # Requires the user to be authenticated
+def add_user_to_organization(org_id):
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+    organization = Organization.query.get(org_id)
+    if user and organization:
+        user.organization = organization
+        db.session.commit()
+        return jsonify({"message": "User added to organization!"}), 200
+    return jsonify({"message": "User or organization not found!"}), 404
+
+# Route to remove a user from an organization (requires authentication)
+@app.route('/organizations/<org_id>/remove_user', methods=['POST'])
+# @jwt_required  # Requires the user to be authenticated
+def remove_user_from_organization(org_id):
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+    if user and user.organization_id == int(org_id):
+        user.organization = None
+        db.session.commit()
+        return jsonify({"message": "User removed from organization!"}), 200
+    return jsonify({"message": "User not found or not in the organization!"}), 404
+
+# Route to list all organizations along with users
+@app.route('/organizations', methods=['GET'])
+def get_organizations():
+    organizations = Organization.query.all()
+    organizations_with_users = [
+        {
+            "id": org.id,
+            "name": org.name,
+            "users": [{"id": user.id, "email": user.email} for user in org.users]
+        }
+        for org in organizations
+    ]
+    return jsonify({"organizations": organizations_with_users})
+
+# Route to get specific organization details along with users
+@app.route('/organizations/<org_id>', methods=['GET'])
+def get_organization(org_id):
+    organization = Organization.query.get(org_id)
+    if organization:
+        organization_details = {
+            "id": organization.id,
+            "name": organization.name,
+            "users": [{"id": user.id, "email": user.email} for user in organization.users]
+        }
+        return jsonify({"organization": organization_details})
+    return jsonify({"message": "Organization not found!"}), 404
 
 @app.route('/users')
 def get_users():
