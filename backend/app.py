@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager, create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -111,9 +111,19 @@ def get_organization(org_id):
         return jsonify({"organization": organization_details})
     return jsonify({"message": "Organization not found!"}), 404
 
+# @app.route('/users')
+# # @jwt_required()  # Requires the user to be authenticated
+# def get_users():
+#     # current_user = get_jwt_identity()  # Get the current user's identity from the token
+#     users = User.query.order_by(User.id.asc()).all()
+#     return {"users": users}
+
 @app.route('/users')
+# @jwt_required()  # Requires the user to be authenticated
 def get_users():
+    print("Fetching users...")
     users = User.query.order_by(User.id.asc()).all()
+    print("Fetched users:", users)
     return {"users": users}
 
 @app.route('/users/<id>')
