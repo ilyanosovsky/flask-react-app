@@ -17,9 +17,9 @@ function App() {
   const [password, setPassword] = useState("");
   const [checked, setChecked] = useState(true);
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (emailInput, passwordInput) => {
     try {
-        await axios.post("/signup", { email, password });
+        await axios.post("/signup", { email: emailInput, password: passwordInput });
         // Handle success and UI update if needed
     } catch (error) {
         console.error("Error signing up:", error);
@@ -27,9 +27,9 @@ function App() {
     }
   }
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (emailInput, passwordInput) => {
     try {
-        const response = await axios.post("/signin", { email, password });
+        const response = await axios.post("/signin", { email: emailInput, password: passwordInput });
         const token = response.data.access_token;
         localStorage.setItem('token', token);
         // Handle success and UI update if needed

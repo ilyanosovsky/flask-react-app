@@ -22,7 +22,7 @@ import LoginIcon from "@mui/icons-material/Login";
 const isEmail = (email) =>
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(email);
 
-export default function Login() {
+  function SignInForm({ setEmail, setPassword, handleSubmit }) {
   const [showPassword, setShowPassword] = React.useState(false);
 
   //Inputs
@@ -69,7 +69,7 @@ export default function Login() {
   };
 
   //handle Submittion
-  const handleSubmit = () => {
+  const handleSubmitForm = () => {
     setSuccess(null);
     //First of all Check for Errors
 
@@ -89,11 +89,12 @@ export default function Login() {
     setFormValid(null);
 
     // Proceed to use the information passed
-    console.log("Email : " + emailInput);
-    console.log("Password : " + passwordInput);
+    console.log("Email Login: " + emailInput);
+    console.log("Password Login: " + passwordInput);
 
     //Show Successfull Submittion
-    setSuccess("Form Submitted Successfully");
+    setSuccess("User Logged In Successfully");
+    handleSubmit(emailInput, passwordInput);
   };
 
   return (
@@ -152,7 +153,7 @@ export default function Login() {
           variant="contained"
           fullWidth
           startIcon={<LoginIcon />}
-          onClick={handleSubmit}
+          onClick={handleSubmitForm}
         >
           LOGIN
         </Button>
@@ -185,3 +186,5 @@ export default function Login() {
     </div>
   );
 }
+
+export default SignInForm;

@@ -89,12 +89,12 @@ function SignUpForm({ setEmail, setPassword, handleSubmit }) {
     setFormValid(null);
 
     // Proceed to use the information passed
-    console.log("Email : " + emailInput);
-    console.log("Password : " + passwordInput);
+    console.log("Email SignUp: " + emailInput);
+    console.log("Password SignUp: " + passwordInput);
 
     //Show Successfull Submittion
-    setSuccess("Form Submitted Successfully");
-    handleSubmit();
+    setSuccess("User Registered Successfully");
+    handleSubmit(emailInput, passwordInput);
   };
 
   return (

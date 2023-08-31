@@ -32,7 +32,7 @@ class Organization(db.Model):
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
-    print("data ----> ", data)
+    print("data signUp ----> ", data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
     new_user = User(email=data['email'], password=hashed_password)
     db.session.add(new_user)
@@ -42,6 +42,7 @@ def signup():
 @app.route('/signin', methods=['POST'])
 def signin():
     data = request.get_json()
+    print("data signIn ----> ", data)
     user = User.query.filter_by(email=data['email']).first()
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({"message": "Invalid credentials!"}), 401
