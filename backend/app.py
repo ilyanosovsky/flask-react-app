@@ -39,6 +39,13 @@ def signup():
     db.session.commit()
     return jsonify({"message": "User created!"}), 201
 
+@app.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE'
+    return response
+
 @app.route('/signin', methods=['POST'])
 def signin():
     data = request.get_json()
@@ -111,20 +118,18 @@ def get_organization(org_id):
         return jsonify({"organization": organization_details})
     return jsonify({"message": "Organization not found!"}), 404
 
-# @app.route('/users')
-# # @jwt_required()  # Requires the user to be authenticated
-# def get_users():
-#     # current_user = get_jwt_identity()  # Get the current user's identity from the token
-#     users = User.query.order_by(User.id.asc()).all()
-#     return {"users": users}
 
 @app.route('/users')
 # @jwt_required()  # Requires the user to be authenticated
 def get_users():
-    print("Fetching users...")
-    users = User.query.order_by(User.id.asc()).all()
-    print("Fetched users:", users)
-    return {"users": users}
+    try:
+        print("Fetching users...")
+        users = User.query.order_by(User.id.asc()).all()
+        print("Fetched users:", users)
+        return {"users": users}
+    except Exception as e:
+        print("Error fetching users:", e)  # Log the error details
+        return jsonify({"message": "An error occurred while fetching users"}), 500
 
 @app.route('/users/<id>')
 def get_user(id):
@@ -139,4 +144,4 @@ def delete_user(id):
     return f'User (id: {id}) deleted!'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
