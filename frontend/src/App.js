@@ -21,6 +21,9 @@ function App() {
     try {
         await axios.post("/signup", { email: emailInput, password: passwordInput });
         // Handle success and UI update if needed
+        setTimeout(() => {
+          setChecked(false); // Switch to SignInForm after successful sign-up
+        }, 1500); // Delay of 1.5 seconds (1500 milliseconds)
     } catch (error) {
         console.error("Error signing up:", error);
         // Handle error and UI update if needed
