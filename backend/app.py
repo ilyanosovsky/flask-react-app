@@ -119,17 +119,18 @@ def get_organization(org_id):
     return jsonify({"message": "Organization not found!"}), 404
 
 
-@app.route('/users')
-# @jwt_required()  # Requires the user to be authenticated
+# All users
+@app.route('/users', methods=['GET'])
 def get_users():
     try:
         print("Fetching users...")
-        users = User.query.order_by(User.id.asc()).all()
+        users = User.query.all()
+        user_list = [{'id': user.id, 'email': user.email} for user in users]
         print("Fetched users:", users)
-        return {"users": users}
+        return jsonify({"users": user_list}), 200
+    
     except Exception as e:
-        print("Error fetching users:", e)  # Log the error details
-        return jsonify({"message": "An error occurred while fetching users"}), 500
+        return jsonify({"message": "An error occurred"}), 500
 
 @app.route('/users/<id>')
 def get_user(id):
