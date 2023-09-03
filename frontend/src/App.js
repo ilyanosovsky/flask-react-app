@@ -1,21 +1,27 @@
-import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./components/LoginPage";
-import HomePage from "./components/HomePage";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import HomePage from "scenes/homePage";
+import LoginPage from "scenes/loginPage";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+import { themeSettings } from "theme";
 
 const App = () => {
-  const isAuth = localStorage.getItem("token") !== null;
+  const mode = useSelector((state) => state.mode);
+  const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+  const isAuth = Boolean(useSelector((state) => state.token));
 
   return (
-    <div className="App">
+    <div className="app">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LoginPage />} />
-          <Route
-            path="/home"
-            element={isAuth ? <HomePage /> : <Navigate to="/" />}
-          />
-        </Routes>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route path="/home" element={isAuth ? <HomePage /> : <Navigate to="/" />} />
+          </Routes>
+        </ThemeProvider>
       </BrowserRouter>
     </div>
   );

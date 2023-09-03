@@ -19,27 +19,20 @@ const LoginPage = () => {
   
     const handleSignUp = async (emailInput, passwordInput) => {
       try {
-          await axios.post("/signup", { email: emailInput, password: passwordInput });
-          // Handle success and UI update if needed
-          setTimeout(() => {
-            setChecked(false); // Switch to SignInForm after successful sign-up
-          }, 1500); // Delay of 1.5 seconds (1500 milliseconds)
+          await axios.post("/signup", { email, password });
       } catch (error) {
           console.error("Error signing up:", error);
-          // Handle error and UI update if needed
       }
     }
   
     const handleSignIn = async (emailInput, passwordInput) => {
       try {
-          const response = await axios.post("/signin", { email: emailInput, password: passwordInput });
+          const response = await axios.post("/signin", { email, password });
           const token = response.data.access_token;
           localStorage.setItem('token ->', token);
-          // Handle success and UI update if needed
-          navigate("/home"); // Use navigate to redirect
+          navigate("/home");
       } catch (error) {
           console.error("Error signing in:", error);
-          // Handle error and UI update if needed
       }
     }
   
