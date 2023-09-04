@@ -34,6 +34,16 @@ export const getOrganization = async (orgId) => {
   }
 };
 
+  // Function to fetch users for the selected organization
+  export const getUsersForOrganization = async (orgId) => {
+    try {
+      const response = await getOrganization(orgId);
+      return response.users;
+    } catch (error) {
+      throw error;
+    }
+  };
+
 // Function to add a user to an organization
 export const addUserToOrganization = async (orgId, email) => {
   try {

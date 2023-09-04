@@ -1,6 +1,7 @@
 import { Box, useMediaQuery } from "@mui/material";
 // import { useSelector } from "react-redux";
 import Navbar from "scenes/navBar";
+import AllOrgs from "scenes/widgets/AllOrgs";
 import CreateOrg from "scenes/widgets/CreateOrg";
 import GetOrg from "scenes/widgets/GetOrg";
 
@@ -29,6 +30,10 @@ const HomePage = () => {
         
         <Box>
           <GetOrg />
+        </Box>
+
+        <Box>
+          <AllOrgs />
         </Box>
 
       </Box>

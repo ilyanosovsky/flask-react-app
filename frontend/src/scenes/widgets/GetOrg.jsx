@@ -5,26 +5,27 @@ import {
   getOrganization,
   addUserToOrganization,
   removeUserFromOrganization,
+  getUsersForOrganization
 } from 'api/api';
 import WidgetWrapper from 'components/WidgetWrapper';
 import {
   Select,
   MenuItem,
   Typography,
-  TextField,
   Button,
   Snackbar,
-  Alert,
+  Alert
 } from '@mui/material';
 import { updateOrganizations } from 'state';
 
 const GetOrg = () => {
   const dispatch = useDispatch();
   const organizations = useSelector((state) => state.organizations);
+  const [users, setUsers] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState('');
   const [orgDetails, setOrgDetails] = useState(null);
-  const [emailToAdd, setEmailToAdd] = useState('');
-  const [emailToRemove, setEmailToRemove] = useState('');
+  const [selectedUserToAdd, setSelectedUserToAdd] = useState('');
+  const [selectedUserToRemove, setSelectedUserToRemove] = useState('');
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -47,7 +48,7 @@ const GetOrg = () => {
     loadOrganizations();
   }, [dispatch]);
 
-  // Load organization details when the selectedOrgId changes
+  // Load organization details and users when the selectedOrgId changes
   useEffect(() => {
     if (selectedOrgId) {
       const loadOrgDetails = async () => {
@@ -59,23 +60,27 @@ const GetOrg = () => {
         }
       };
 
+      const loadUsers = async () => {
+        try {
+          const usersResponse = await getUsersForOrganization(selectedOrgId);
+          setUsers(usersResponse.users);
+        } catch (error) {
+          console.error('Error loading users:', error);
+        }
+      };
+
       loadOrgDetails();
+      loadUsers();
     } else {
-      // Clear orgDetails when no organization is selected
       setOrgDetails(null);
+      setUsers([]);
     }
   }, [selectedOrgId]);
 
   const handleAddUser = async () => {
     try {
-      // Call the API to add a user to the selected organization
-      await addUserToOrganization(selectedOrgId, emailToAdd);
-      // Optionally, update the orgDetails state or dispatch actions
-      // ...
-
-      // Clear the input field
-      setEmailToAdd('');
-      // Show Snackbar with success message
+      await addUserToOrganization(selectedOrgId, selectedUserToAdd);
+      setSelectedUserToAdd("");
       setSnackbarMessage('User added successfully');
       setSnackbarOpen(true);
     } catch (error) {
@@ -85,14 +90,8 @@ const GetOrg = () => {
 
   const handleRemoveUser = async () => {
     try {
-      // Call the API to remove a user from the selected organization
-      await removeUserFromOrganization(selectedOrgId, emailToRemove);
-      // Optionally, update the orgDetails state or dispatch actions
-      // ...
-
-      // Clear the input field
-      setEmailToRemove('');
-      // Show Snackbar with success message
+      await removeUserFromOrganization(selectedOrgId, selectedUserToRemove);
+      setSelectedUserToRemove("");
       setSnackbarMessage('User removed successfully');
       setSnackbarOpen(true);
     } catch (error) {
@@ -122,26 +121,47 @@ const GetOrg = () => {
           <Typography>ID: {orgDetails.id}</Typography>
           <Typography>Name: {orgDetails.name}</Typography>
 
+          <Typography variant="h5">Users in Organization</Typography>
+          {/* <Box border={1} p={2} mb={2}>
+            {users.length > 0 ? (
+              users.map((user) => (
+                <div key={user.id}>{user.email}</div>
+              ))
+            ) : (
+              <Typography>No users available.</Typography>
+            )}
+          </Box> */}
+
           <Typography variant="h5">Add User to Organization</Typography>
-          <TextField
-            label="User Email"
-            variant="outlined"
+          <Select
+            value={selectedUserToAdd}
+            onChange={(e) => setSelectedUserToAdd(e.target.value)}
             fullWidth
-            value={emailToAdd}
-            onChange={(e) => setEmailToAdd(e.target.value)}
-          />
+          >
+            <MenuItem value={null}>Select a user to add</MenuItem>
+            {/* {users.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                {user.email}
+              </MenuItem>
+            ))} */}
+          </Select>
           <Button variant="contained" color="primary" onClick={handleAddUser}>
             Add User
           </Button>
 
           <Typography variant="h5">Remove User from Organization</Typography>
-          <TextField
-            label="User Email"
-            variant="outlined"
+          <Select
+            value={selectedUserToRemove}
+            onChange={(e) => setSelectedUserToRemove(e.target.value)}
             fullWidth
-            value={emailToRemove}
-            onChange={(e) => setEmailToRemove(e.target.value)}
-          />
+          >
+            <MenuItem value={null}>Select a user to remove</MenuItem>
+            {/* {users.map((user) => (
+              <MenuItem key={user.id} value={user.id}>
+                {user.email}
+              </MenuItem>
+            ))} */}
+          </Select>
           <Button variant="contained" color="secondary" onClick={handleRemoveUser}>
             Remove User
           </Button>
