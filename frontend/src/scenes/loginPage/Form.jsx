@@ -6,6 +6,7 @@ import {
   useMediaQuery,
   Typography,
   useTheme,
+  Snackbar,
 } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -13,15 +14,16 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLogin } from "state";
 import axios from 'axios';
+import MuiAlert from '@mui/material/Alert';
 
 const registerSchema = yup.object().shape({
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
+  email: yup.string().email("Invalid email").required("Required"),
+  password: yup.string().required("Required"),
 });
 
 const loginSchema = yup.object().shape({
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
+  email: yup.string().email("Invalid email").required("Required"),
+  password: yup.string().required("Required"),
 });
 
 const initialValuesRegister = {
@@ -43,6 +45,17 @@ const Form = () => {
   const isLogin = pageType === "login";
   const isRegister = pageType === "register";
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbarOpen(false);
+  };
+
   const register = async (values, onSubmitProps) => {
     try {
       const response = await axios.post(`/signup`, {
@@ -54,6 +67,8 @@ const Form = () => {
       setPageType('login');
     } catch (error) {
       console.error('Error registering:', error);
+      setSnackbarMessage('Registration failed. Please try again.'); // Set the error message
+      setSnackbarOpen(true); // Open the Snackbar
     }
   };
 
@@ -75,6 +90,8 @@ const Form = () => {
       navigate('/home');
     } catch (error) {
       console.error('Error logging in:', error);
+      setSnackbarMessage('Login failed. Please check your credentials and try again.');
+      setSnackbarOpen(true);
     }
   };
 
@@ -84,92 +101,106 @@ const Form = () => {
   };
 
   return (
-      <Formik
-        onSubmit={handleFormSubmit}
-        initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
-        validationSchema={isLogin ? loginSchema : registerSchema}
-      >
-        {({
-          values,
-          errors,
-          touched,
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          setFieldValue,
-          resetForm,
-        }) => (
-          <form onSubmit={handleSubmit}>
-            <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+    <Formik
+      onSubmit={handleFormSubmit}
+      initialValues={isLogin ? initialValuesLogin : initialValuesRegister}
+      validationSchema={isLogin ? loginSchema : registerSchema}
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleBlur,
+        handleChange,
+        handleSubmit,
+        resetForm,
+      }) => (
+        <form onSubmit={handleSubmit}>
+          <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+            sx={{
+              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+            }}
+          >
+              <>
+                <TextField
+                  label="Email"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                  name="email"
+                  error={Boolean(touched.email) && Boolean(errors.email)}
+                  helperText={touched.email && errors.email}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  label="Password"
+                  type="password"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                  name="password"
+                  error={Boolean(touched.password) && Boolean(errors.password)}
+                  helperText={touched.password && errors.password}
+                  sx={{ gridColumn: "span 4" }}
+                />
+              </>
+          </Box>
+
+          {/* BUTTONS */}
+          <Box>
+            <Button
+              fullWidth
+              type="submit"
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                m: "2rem 0",
+                p: "1rem",
+                backgroundColor: palette.primary.main,
+                color: palette.background.alt,
+                "&:hover": { color: palette.primary.main },
               }}
             >
-                <>
-                  <TextField
-                    label="Email"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.email}
-                    name="email"
-                    error={Boolean(touched.email) && Boolean(errors.email)}
-                    helperText={touched.email && errors.email}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                  <TextField
-                    label="Password"
-                    type="password"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.password}
-                    name="password"
-                    error={Boolean(touched.password) && Boolean(errors.password)}
-                    helperText={touched.password && errors.password}
-                    sx={{ gridColumn: "span 4" }}
-                  />
-                </>
-            </Box>
+              {isLogin ? "LOGIN" : "REGISTER"}
+            </Button>
+            <Typography
+              onClick={() => {
+                setPageType(isLogin ? "register" : "login");
+                resetForm();
+              }}
+              sx={{
+                textDecoration: "underline",
+                color: palette.primary.main,
+                "&:hover": {
+                  cursor: "pointer",
+                  color: palette.primary.light,
+                },
+              }}
+            >
+              {isLogin
+                ? "Don't have an account? Sign Up here."
+                : "Already have an account? Login here."}
+            </Typography>
+          </Box>
 
-            {/* BUTTONS */}
-            <Box>
-              <Button
-                fullWidth
-                type="submit"
-                sx={{
-                  m: "2rem 0",
-                  p: "1rem",
-                  backgroundColor: palette.primary.main,
-                  color: palette.background.alt,
-                  "&:hover": { color: palette.primary.main },
-                }}
-              >
-                {isLogin ? "LOGIN" : "REGISTER"}
-              </Button>
-              <Typography
-                onClick={() => {
-                  setPageType(isLogin ? "register" : "login");
-                  resetForm();
-                }}
-                sx={{
-                  textDecoration: "underline",
-                  color: palette.primary.main,
-                  "&:hover": {
-                    cursor: "pointer",
-                    color: palette.primary.light,
-                  },
-                }}
-              >
-                {isLogin
-                  ? "Don't have an account? Sign Up here."
-                  : "Already have an account? Login here."}
-              </Typography>
-            </Box>
-          </form>
-        )}
-      </Formik>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+          >
+            <MuiAlert
+              elevation={6}
+              variant="filled"
+              severity="error"
+              onClose={handleCloseSnackbar}
+            >
+              {snackbarMessage}
+            </MuiAlert>
+          </Snackbar>
+        </form>
+      )}
+    </Formik>
   );
 };
 
