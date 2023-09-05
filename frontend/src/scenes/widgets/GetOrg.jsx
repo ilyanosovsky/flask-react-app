@@ -95,20 +95,24 @@ const GetOrg = () => {
 
   const handleAddUser = async () => {
     try {
-      const userToAdd = usersNotInOrg.find(user => user.id === selectedUserToAdd);
+      const userToAdd = usersNotInOrg.find((user) => user.id === selectedUserToAdd);
       if (userToAdd) {
         await addUserToOrganization(selectedOrgId, userToAdd.email);
         setSelectedUserToAdd("");
-        setSnackbarMessage('User added successfully');
+        setSnackbarMessage("User added successfully");
         setSnackbarOpen(true);
-        
-        // Reload data after adding user
+  
+        // Fetch the updated list of users not in any organization and set it
+        const updatedUsersNotInOrg = await getUsersNotInOrganization();
+        setUsersNotInOrg(updatedUsersNotInOrg.users_not_in_organization);
+  
+        // Reload organization data after adding user
         loadOrgData(selectedOrgId);
       } else {
-        console.error('User not found in the list of users.');
+        console.error("User not found in the list of users.");
       }
     } catch (error) {
-      console.error('Error adding user to organization:', error);
+      console.error("Error adding user to organization:", error);
     }
   };
   
@@ -116,20 +120,26 @@ const GetOrg = () => {
   const handleRemoveUser = async () => {
     try {
       // Convert selectedUserToRemove to the email of the user to be removed
-      const userToRemove = users.find(user => user.id === selectedUserToRemove);
+      const userToRemove = users.find((user) => user.id === selectedUserToRemove);
       if (userToRemove) {
         await removeUserFromOrganization(selectedOrgId, userToRemove.email);
         setSelectedUserToRemove("");
-        setSnackbarMessage('User removed successfully');
+        setSnackbarMessage("User removed successfully");
         setSnackbarOpen(true);
-        loadOrgData(selectedOrgId); // Reload data after removing user
+  
+        // Fetch the updated list of users not in any organization and set it
+        const updatedUsersNotInOrg = await getUsersNotInOrganization();
+        setUsersNotInOrg(updatedUsersNotInOrg.users_not_in_organization);
+  
+        // Reload organization data after removing user
+        loadOrgData(selectedOrgId);
       } else {
-        console.error('User not found in the list of users.');
+        console.error("User not found in the list of users.");
       }
     } catch (error) {
-      console.error('Error removing user from organization:', error);
+      console.error("Error removing user from organization:", error);
     }
-  };
+  };  
 
     // Render loading state
     if (isLoading) {
