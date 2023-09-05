@@ -30,7 +30,16 @@ Flask-React-App is a web application designed to simplify organization and user 
 ![desk-dark](img/desk-dark.png)
 ![desk-light](img/desk-light.png)
 
-![mob-light](img/mob-light.png) ![mob-dark](img/mob-dark.png)
+<table>
+  <tr>
+    <td align="center"><img src="img/mob-light.png" alt="Mobile Light" /></td>
+    <td align="center"><img src="img/mob-dark.png" alt="Mobile Dark" /></td>
+  </tr>
+  <tr>
+    <td align="center">Mobile Light</td>
+    <td align="center">Mobile Dark</td>
+  </tr>
+</table>
 
 ## Project Structure
 
@@ -68,6 +77,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@localhost:5432/flask-db'
 
 db = SQLAlchemy(app)
+```
 
 Replace 'postgresql://username:password@localhost:5432/flask-db' with your PostgreSQL connection details, including the username, password, host, port, and database name.
 
@@ -125,6 +135,7 @@ To get started, follow these steps:
 ```bash
 git clone https://github.com/your-username/flask-react-app.git
 cd flask-react-app
+```
 
 ### Running the Backend
 
@@ -132,12 +143,14 @@ Create a Virtual Environment (Optional): It's recommended to create a virtual en
 
 Install Python dependencies:
 
+```bash
 pip install -r requirements.txt
-
+```
 Once the dependencies are installed, you can start the development server by running:
 
+```bash
 python app.py
-
+```
 ### Running the Frontend
 
 To run the frontend of the Flask-React-App locally, follow these steps:
@@ -150,10 +163,13 @@ To run the frontend of the Flask-React-App locally, follow these steps:
 
    ```bash
    npm install
-    
+    ```
 
 Once the dependencies are installed, you can start the development server by running:
+```bash
     npm start
+```
+
 This will launch the development server, and your React application will be available in your web browser at http://localhost:3000.
 
 ## Usage
