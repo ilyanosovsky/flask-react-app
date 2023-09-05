@@ -34,15 +34,25 @@ export const getOrganization = async (orgId) => {
   }
 };
 
-  // Function to fetch users for the selected organization
-  export const getUsersForOrganization = async (orgId) => {
-    try {
-      const response = await getOrganization(orgId);
-      return response.users;
-    } catch (error) {
-      throw error;
-    }
-  };
+// Function to fetch users for the selected organization
+export const getUsersForOrganization = async (orgId) => {
+  try {
+    const response = await getOrganization(orgId);
+    return response.users;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Function to get users who are not in any organization
+export const getUsersNotInOrganization = async () => {
+  try {
+    const response = await api.get('/users/not_in_organization');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 // Function to add a user to an organization
 export const addUserToOrganization = async (orgId, email) => {

@@ -5,7 +5,8 @@ import {
   getOrganization,
   addUserToOrganization,
   removeUserFromOrganization,
-  getUsersForOrganization
+  getUsersForOrganization,
+  getUsersNotInOrganization
 } from 'api/api';
 import WidgetWrapper from 'components/WidgetWrapper';
 import {
@@ -23,6 +24,7 @@ const GetOrg = () => {
   const dispatch = useDispatch();
   const organizations = useSelector((state) => state.organizations);
   const usersInOrganization = useSelector((state) => state.usersInOrganization);
+  const [usersNotInOrg, setUsersNotInOrg] = useState([]);
   const [users, setUsers] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState('');
   const [orgDetails, setOrgDetails] = useState(null);
@@ -53,6 +55,20 @@ const GetOrg = () => {
     }
   };
 
+  // Load users who are not in any organization when the component mounts
+  useEffect(() => {
+    const loadUsersNotInOrg = async () => {
+        try {
+        const response = await getUsersNotInOrganization();
+        setUsersNotInOrg(response.users_not_in_organization);
+        } catch (error) {
+        console.error('Error loading users not in organization:', error);
+        }
+    };
+
+    loadUsersNotInOrg();
+    }, []);
+
   // Load organizations when the component mounts
   useEffect(() => {
     const loadOrganizations = async () => {
@@ -79,15 +95,23 @@ const GetOrg = () => {
 
   const handleAddUser = async () => {
     try {
-      await addUserToOrganization(selectedOrgId, selectedUserToAdd);
-      setSelectedUserToAdd("");
-      setSnackbarMessage('User added successfully');
-      setSnackbarOpen(true);
-      loadOrgData(selectedOrgId); // Reload data after adding user
+      const userToAdd = usersNotInOrg.find(user => user.id === selectedUserToAdd);
+      if (userToAdd) {
+        await addUserToOrganization(selectedOrgId, userToAdd.email);
+        setSelectedUserToAdd("");
+        setSnackbarMessage('User added successfully');
+        setSnackbarOpen(true);
+        
+        // Reload data after adding user
+        loadOrgData(selectedOrgId);
+      } else {
+        console.error('User not found in the list of users.');
+      }
     } catch (error) {
       console.error('Error adding user to organization:', error);
     }
   };
+  
 
   const handleRemoveUser = async () => {
     try {
@@ -141,9 +165,12 @@ const GetOrg = () => {
 
           <Typography variant="h5">Users in Organization</Typography>
           <Box border={1} p={2} mb={2}>
-            {users.length > 0 && (users.map((user) => (
+            {users.length > 0 ? (
+                users.map((user) => (
                 <div key={user.id}>{user.email}</div>
-              )) 
+                ))
+            ) : (
+                <div>No users in organization</div>
             )}
           </Box>
 
@@ -154,7 +181,7 @@ const GetOrg = () => {
             fullWidth
           >
             <MenuItem value={null}>Select a user to add</MenuItem>
-            {users.length > 0 && (users.map((user) => (
+            {usersNotInOrg.length > 0 && (usersNotInOrg.map((user) => (
               <MenuItem key={user.id} value={user.id}>
                 {user.email}
               </MenuItem>)

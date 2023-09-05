@@ -133,6 +133,14 @@ def get_users():
     
     except Exception as e:
         return jsonify({"message": "An error occurred"}), 500
+    
+# Route to get users who are not in any organization
+@app.route('/users/not_in_organization', methods=['GET'])
+# @jwt_required  # Requires the user to be authenticated
+def get_users_not_in_organization():
+    users = User.query.filter_by(organization_id=None).all()
+    user_list = [{'id': user.id, 'email': user.email} for user in users]
+    return jsonify({"users_not_in_organization": user_list})
 
 @app.route('/users/<id>')
 def get_user(id):
