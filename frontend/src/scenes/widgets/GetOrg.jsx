@@ -16,9 +16,10 @@ import {
   Button,
   Snackbar,
   Box,
+  useTheme,
   Alert
 } from '@mui/material';
-import { updateOrganizations, updateUsersInOrganization } from 'state';
+import { updateOrganizations } from 'state';
 
 const GetOrg = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,10 @@ const GetOrg = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isLoading, setLoading] = useState(false); // Loading state
   const [error, setError] = useState(null); // Error state
+
+  const { palette } = useTheme();
+  const dark = palette.neutral.dark;
+  const main = palette.neutral.main;
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
@@ -153,10 +158,19 @@ const GetOrg = () => {
 
   return (
     <WidgetWrapper>
-      <Typography variant="h5">Select an Organization</Typography>
+          <Typography
+              variant="h4"
+              color={dark}
+              fontWeight="500"
+              mb="0.5rem"
+            >
+              Add Users to Organization
+      </Typography>
+      <Typography variant="h5" color={dark} mb="0.5rem">Select an Organization</Typography>
       <Select
         value={selectedOrgId}
         onChange={(e) => setSelectedOrgId(e.target.value)}
+        mb="0.5rem"
         fullWidth
       >
         <MenuItem value="">Select an organization</MenuItem>
@@ -169,12 +183,12 @@ const GetOrg = () => {
 
       {orgDetails && (
         <div>
-          <Typography variant="h5">Organization Details</Typography>
-          <Typography>ID: {orgDetails.id}</Typography>
-          <Typography>Name: {orgDetails.name}</Typography>
+          <Typography variant="h5" mt="1rem">Organization Details</Typography>
+          <Typography ml="1rem">ID: {orgDetails.id}</Typography>
+          <Typography ml="1rem">Name: {orgDetails.name}</Typography>
 
-          <Typography variant="h5">Users in Organization</Typography>
-          <Box border={1} p={2} mb={2}>
+          <Typography variant="h5" mt="1rem">Users in Organization</Typography>
+          <Box border={1} p={2} mb={2} mt={1} borderColor={main}>
             {users.length > 0 ? (
                 users.map((user) => (
                 <div key={user.id}>{user.email}</div>
@@ -184,10 +198,11 @@ const GetOrg = () => {
             )}
           </Box>
 
-          <Typography variant="h5">Add User to Organization</Typography>
+          <Typography variant="h5" mb="0.5rem">Add User to Organization</Typography>
           <Select
             value={selectedUserToAdd}
             onChange={(e) => setSelectedUserToAdd(e.target.value)}
+            sx={{ marginBottom:"0.5rem" }}
             fullWidth
           >
             <MenuItem value={null}>Select a user to add</MenuItem>
@@ -197,14 +212,15 @@ const GetOrg = () => {
               </MenuItem>)
             ))}
           </Select>
-          <Button variant="contained" color="primary" onClick={handleAddUser}>
+          <Button variant="contained" fullWidth color="primary" onClick={handleAddUser}>
             Add User
           </Button>
 
-          <Typography variant="h5">Remove User from Organization</Typography>
+          <Typography variant="h5" mb="0.5rem" mt="1rem">Remove User from Organization</Typography>
           <Select
             value={selectedUserToRemove}
             onChange={(e) => setSelectedUserToRemove(e.target.value)}
+            sx={{ marginBottom:"0.5rem" }} 
             fullWidth
           >
             <MenuItem value={null}>Select a user to remove</MenuItem>
@@ -214,7 +230,7 @@ const GetOrg = () => {
               </MenuItem>)
             ))}
           </Select>
-          <Button variant="contained" color="secondary" onClick={handleRemoveUser}>
+          <Button variant="contained" fullWidth mb="1rem" color="secondary" onClick={handleRemoveUser}>
             Remove User
           </Button>
         </div>

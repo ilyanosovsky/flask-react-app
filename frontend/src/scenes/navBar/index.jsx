@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { 
     Box,
     IconButton,
@@ -36,8 +36,7 @@ const Navbar = () => {
     const primaryLight = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
 
-    const userEmail = `${user.email}`;
-    console.log("userEmail -> ", userEmail);
+    const userEmail = `${user}`;
 
     return(
         <FlexBetween padding="1rem 6%" backgroundColor={alt}>
@@ -73,7 +72,7 @@ const Navbar = () => {
                             value={userEmail}
                             sx={{
                                 backgroundColor: neutralLight,
-                                width: "150px",
+                                width: "200px",
                                 borderRadius: "0.25rem",
                                 p: "0.25rem 1rem",
                                 "& .MuiSvgIcon-root": {
@@ -146,7 +145,7 @@ const Navbar = () => {
                         value={userEmail}
                         sx={{
                         backgroundColor: neutralLight,
-                        width: "150px",
+                        width: "200px",
                         borderRadius: "0.25rem",
                         p: "0.25rem 1rem",
                         "& .MuiSvgIcon-root": {

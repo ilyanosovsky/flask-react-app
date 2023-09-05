@@ -1,5 +1,4 @@
 import { Box, useMediaQuery } from "@mui/material";
-// import { useSelector } from "react-redux";
 import Navbar from "scenes/navBar";
 import AllOrgs from "scenes/widgets/AllOrgs";
 import CreateOrg from "scenes/widgets/CreateOrg";
@@ -24,15 +23,19 @@ const HomePage = () => {
         justifyContent="space-between"
       >
 
-        <Box>
+        <Box flexBasis={isNonMobileScreens ? "30%" : undefined}>
           <CreateOrg />
         </Box>
         
-        <Box>
+        <Box
+          flexBasis={isNonMobileScreens ? "40%" : undefined}
+          mt={isNonMobileScreens ? undefined : "2rem"}
+          mb="2rem"
+        >
           <GetOrg />
         </Box>
 
-        <Box>
+        <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <AllOrgs />
         </Box>
 

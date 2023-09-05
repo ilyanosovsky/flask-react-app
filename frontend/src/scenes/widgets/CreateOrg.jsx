@@ -7,6 +7,8 @@ import {
   Button,
   Snackbar,
   Alert,
+  useTheme,
+  Typography,
 } from '@mui/material';
 import WidgetWrapper from 'components/WidgetWrapper';
 
@@ -16,25 +18,20 @@ const CreateOrg = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
+  const { palette } = useTheme();
+  const dark = palette.neutral.dark;
+
   const handleCreateOrg = async () => {
     try {
-      // Call the API to create an organization
-      await createOrganization(orgName);
-
-      // Show a Snackbar with a success message
-      setSnackbarMessage('Organization created successfully');
+      await createOrganization(orgName); // Call the API to create an organization
+      setSnackbarMessage('Organization created successfully'); // Show a Snackbar with a success message
       setSnackbarOpen(true);
-
-      // Clear the input field
-      setOrgName('');
-
-      // Update the list of organizations
-      const organizations = await getOrganizations();
+      setOrgName(''); // Clear the input field
+      const organizations = await getOrganizations(); // Update the list of organizations
       // Dispatch an action to update the organization list in your Redux store
       dispatch(updateOrganizations(organizations));
     } catch (error) {
       console.error('Error creating organization:', error);
-      // Handle error scenarios here, if needed
     }
   };
 
@@ -44,24 +41,34 @@ const CreateOrg = () => {
 
   return (
     <WidgetWrapper>
-      <h2>Create a New Organization</h2>
+      <Typography
+              variant="h4"
+              color={dark}
+              fontWeight="500"
+              mb="0.5rem"
+            >
+              Create a New Organization
+      </Typography>
       <TextField
         label="Organization Name"
         variant="outlined"
         fullWidth
+        sx={{ marginBottom:"0.5rem" }} 
         value={orgName}
         onChange={(e) => setOrgName(e.target.value)}
       />
       <Button
         variant="contained"
+        fullWidth
         color="primary"
+        sx={{ marginBottom:"1rem" }} 
         onClick={handleCreateOrg}
       >
         Create
       </Button>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={4000} // Adjust the duration as needed
+        autoHideDuration={4000}
         onClose={handleSnackbarClose}
       >
         <Alert onClose={handleSnackbarClose} severity="success" variant="filled">

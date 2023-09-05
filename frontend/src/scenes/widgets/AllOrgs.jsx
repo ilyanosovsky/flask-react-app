@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Typography, Paper } from '@mui/material';
+import { Container, Typography, Paper, useTheme } from '@mui/material';
 import WidgetWrapper from 'components/WidgetWrapper';
 import {
   getOrganizations,
   getUsersForOrganization,
-  addUserToOrganization, // Import the necessary actions
-  removeUserFromOrganization, // Import the necessary actions
+  addUserToOrganization, 
+  removeUserFromOrganization, 
 } from 'api/api';
 import {
   updateOrganizations,
@@ -16,6 +16,9 @@ import {
 function AllOrgs() {
   const dispatch = useDispatch();
   const organizations = useSelector((state) => state.organizations);
+
+  const { palette } = useTheme();
+  const dark = palette.neutral.dark;
 
   // Load organizations when the component mounts
   useEffect(() => {
@@ -35,7 +38,7 @@ function AllOrgs() {
   const loadUsersForOrganization = async (orgId) => {
     try {
       const usersResponse = await getUsersForOrganization(orgId);
-      dispatch(updateUsersInOrganization(orgId, usersResponse)); // Update the Redux store with the users for the specific organization
+      dispatch(updateUsersInOrganization(orgId, usersResponse));
     } catch (error) {
       console.error('Error loading users for organization:', error);
     }
@@ -66,7 +69,14 @@ function AllOrgs() {
   return (
     <WidgetWrapper>
       <Container>
-        <Typography variant="h3">Organizations</Typography>
+      <Typography
+              variant="h4"
+              color={dark}
+              fontWeight="500"
+              mb="0.5rem"
+            >
+              Organizations
+      </Typography>
         {organizations.length > 0 ? (
           organizations.map((org) => (
             <Paper
@@ -76,9 +86,13 @@ function AllOrgs() {
             >
               <Typography variant="h4">{org.name}</Typography>
               <hr />
-              {org.users.map((user) => (
-                <Typography key={user.id}>{user.email}</Typography>
-              ))}
+              {org.users.length > 0 ? (
+                  org.users.map((user) => (
+                    <Typography key={user.id}>{user.email}</Typography>
+                  ))
+              ) : (
+                  <Typography>No users here</Typography>
+              )}
             </Paper>
           ))
         ) : (

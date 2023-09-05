@@ -95,6 +95,7 @@ def remove_user_from_organization(org_id):
 
 # Route to list all organizations along with users
 @app.route('/organizations', methods=['GET'])
+# @jwt_required  # Requires the user to be authenticated
 def get_organizations():
     organizations = Organization.query.all()
     organizations_with_users = [
@@ -109,6 +110,7 @@ def get_organizations():
 
 # Route to get specific organization details along with users
 @app.route('/organizations/<org_id>', methods=['GET'])
+# @jwt_required  # Requires the user to be authenticate
 def get_organization(org_id):
     organization = Organization.query.get(org_id)
     if organization:
@@ -123,6 +125,7 @@ def get_organization(org_id):
 
 # All users
 @app.route('/users', methods=['GET'])
+# @jwt_required  # Requires the user to be authenticated
 def get_users():
     try:
         print("Fetching users...")
