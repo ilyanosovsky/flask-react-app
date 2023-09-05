@@ -11,14 +11,18 @@ The app's technology stack comprises:
 ## Table of Contents
 
 - [Overview](#overview)
-- [Screenshots](#screenshots)
 - [Project Structure](#project-structure)
 - [Backend and API](#backend-and-api)
+    - [PostgreSQL Database](#postgresql-database)
+    - [Database Connection](#database-connection)
 - [Frontend](#frontend)
-- [Authentication](#authentication)
+    - [Frontend Architecture](#frontend-architecture)
+    - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+  - [Running the Backend](#running-the-backend)
+  - [Running the Frontend](#running-the-frontend)
 - [Usage](#usage)
 - [Contributing](#contributing)
 
@@ -43,6 +47,8 @@ Flask-React-App is a web application designed to simplify organization and user 
 
 ## Project Structure
 
+```java
+
 flask-react-app/
 │
 ├── backend/
@@ -57,6 +63,8 @@ flask-react-app/
 │   ├── ...
 │
 └── README.md
+
+```
 
 ## Backend and API
 
@@ -161,9 +169,9 @@ To run the frontend of the Flask-React-App locally, follow these steps:
 
 3. Install the required dependencies by running the following command:
 
-   ```bash
-   npm install
-    ```
+```bash
+    npm install
+```
 
 Once the dependencies are installed, you can start the development server by running:
 ```bash
