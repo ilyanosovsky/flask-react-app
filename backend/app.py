@@ -71,6 +71,7 @@ def create_organization():
 # @jwt_required  # Requires the user to be authenticated
 def add_user_to_organization(org_id):
     data = request.get_json()
+    print(f"to add --> org_id: {org_id}, data: {data}") 
     user = User.query.filter_by(email=data['email']).first()
     organization = Organization.query.get(org_id)
     if user and organization:
@@ -84,11 +85,12 @@ def add_user_to_organization(org_id):
 # @jwt_required  # Requires the user to be authenticated
 def remove_user_from_organization(org_id):
     data = request.get_json()
+    print(f"to remove --> org_id: {org_id}, data: {data}") 
     user = User.query.filter_by(email=data['email']).first()
     if user and user.organization_id == int(org_id):
         user.organization = None
         db.session.commit()
-        return jsonify({"message": "User removed from organization!"}), 200
+        return jsonify({"message": "User removed from organization properly!"}), 200
     return jsonify({"message": "User not found or not in the organization!"}), 404
 
 # Route to list all organizations along with users

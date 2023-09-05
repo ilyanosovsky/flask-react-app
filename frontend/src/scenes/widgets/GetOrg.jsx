@@ -14,13 +14,15 @@ import {
   Typography,
   Button,
   Snackbar,
+  Box,
   Alert
 } from '@mui/material';
-import { updateOrganizations } from 'state';
+import { updateOrganizations, updateUsersInOrganization } from 'state';
 
 const GetOrg = () => {
   const dispatch = useDispatch();
   const organizations = useSelector((state) => state.organizations);
+  const usersInOrganization = useSelector((state) => state.usersInOrganization);
   const [users, setUsers] = useState([]);
   const [selectedOrgId, setSelectedOrgId] = useState('');
   const [orgDetails, setOrgDetails] = useState(null);
@@ -28,10 +30,27 @@ const GetOrg = () => {
   const [selectedUserToRemove, setSelectedUserToRemove] = useState('');
   const [isSnackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [isLoading, setLoading] = useState(false); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
     setSnackbarMessage('');
+  };
+
+  const loadOrgData = async (orgId) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const org = await getOrganization(orgId);
+      setOrgDetails(org);
+      const usersResponse = await getUsersForOrganization(orgId);
+      setUsers(usersResponse);
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
   };
 
   // Load organizations when the component mounts
@@ -51,26 +70,7 @@ const GetOrg = () => {
   // Load organization details and users when the selectedOrgId changes
   useEffect(() => {
     if (selectedOrgId) {
-      const loadOrgDetails = async () => {
-        try {
-          const org = await getOrganization(selectedOrgId);
-          setOrgDetails(org);
-        } catch (error) {
-          console.error('Error loading organization details:', error);
-        }
-      };
-
-      const loadUsers = async () => {
-        try {
-          const usersResponse = await getUsersForOrganization(selectedOrgId);
-          setUsers(usersResponse.users);
-        } catch (error) {
-          console.error('Error loading users:', error);
-        }
-      };
-
-      loadOrgDetails();
-      loadUsers();
+      loadOrgData(selectedOrgId);
     } else {
       setOrgDetails(null);
       setUsers([]);
@@ -83,6 +83,7 @@ const GetOrg = () => {
       setSelectedUserToAdd("");
       setSnackbarMessage('User added successfully');
       setSnackbarOpen(true);
+      loadOrgData(selectedOrgId); // Reload data after adding user
     } catch (error) {
       console.error('Error adding user to organization:', error);
     }
@@ -90,14 +91,31 @@ const GetOrg = () => {
 
   const handleRemoveUser = async () => {
     try {
-      await removeUserFromOrganization(selectedOrgId, selectedUserToRemove);
-      setSelectedUserToRemove("");
-      setSnackbarMessage('User removed successfully');
-      setSnackbarOpen(true);
+      // Convert selectedUserToRemove to the email of the user to be removed
+      const userToRemove = users.find(user => user.id === selectedUserToRemove);
+      if (userToRemove) {
+        await removeUserFromOrganization(selectedOrgId, userToRemove.email);
+        setSelectedUserToRemove("");
+        setSnackbarMessage('User removed successfully');
+        setSnackbarOpen(true);
+        loadOrgData(selectedOrgId); // Reload data after removing user
+      } else {
+        console.error('User not found in the list of users.');
+      }
     } catch (error) {
       console.error('Error removing user from organization:', error);
     }
   };
+
+    // Render loading state
+    if (isLoading) {
+    return <p>Loading...</p>;
+    }
+
+    // Render error state
+    if (error) {
+    return <p>Error: {error.message}</p>;
+    }
 
   return (
     <WidgetWrapper>
@@ -122,15 +140,12 @@ const GetOrg = () => {
           <Typography>Name: {orgDetails.name}</Typography>
 
           <Typography variant="h5">Users in Organization</Typography>
-          {/* <Box border={1} p={2} mb={2}>
-            {users.length > 0 ? (
-              users.map((user) => (
+          <Box border={1} p={2} mb={2}>
+            {users.length > 0 && (users.map((user) => (
                 <div key={user.id}>{user.email}</div>
-              ))
-            ) : (
-              <Typography>No users available.</Typography>
+              )) 
             )}
-          </Box> */}
+          </Box>
 
           <Typography variant="h5">Add User to Organization</Typography>
           <Select
@@ -139,11 +154,11 @@ const GetOrg = () => {
             fullWidth
           >
             <MenuItem value={null}>Select a user to add</MenuItem>
-            {/* {users.map((user) => (
+            {users.length > 0 && (users.map((user) => (
               <MenuItem key={user.id} value={user.id}>
                 {user.email}
-              </MenuItem>
-            ))} */}
+              </MenuItem>)
+            ))}
           </Select>
           <Button variant="contained" color="primary" onClick={handleAddUser}>
             Add User
@@ -156,11 +171,11 @@ const GetOrg = () => {
             fullWidth
           >
             <MenuItem value={null}>Select a user to remove</MenuItem>
-            {/* {users.map((user) => (
+            {users.length > 0 && (users.map((user) => (
               <MenuItem key={user.id} value={user.id}>
                 {user.email}
-              </MenuItem>
-            ))} */}
+              </MenuItem>)
+            ))}
           </Select>
           <Button variant="contained" color="secondary" onClick={handleRemoveUser}>
             Remove User

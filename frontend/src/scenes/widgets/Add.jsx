@@ -64,12 +64,12 @@ function AddU() {
                     variant="outlined"
                     style={{ marginTop: '10px' }}
                 >
-                    <MenuItem value={null}>Select User</MenuItem>
-                    {users.map((user) => (
+                    <MenuItem value=''>Select User</MenuItem>
+                    {users.length > 0 && users.map((user) => (
                         <MenuItem key={user.id} value={user.id}>
                             {user.email}
                         </MenuItem>
-                    ))}
+                        ))}
                 </Select>
 
                 <Button variant="contained" onClick={handleAddUserToOrganization}>
